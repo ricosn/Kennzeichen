@@ -1,0 +1,26 @@
+name: Build und Tests
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+jobs:
+  build:
+    runs-on: windows-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-dotnet@v4
+        with:
+          global-json-file: global.json
+
+      - name: Modelle herunterladen
+        shell: pwsh
+        run: ./tools/download-models.ps1
+
+      - name: Bauen
+        run: dotnet build -c Release
+
+      - name: Testen
+        run: dotnet test -c Release --no-build

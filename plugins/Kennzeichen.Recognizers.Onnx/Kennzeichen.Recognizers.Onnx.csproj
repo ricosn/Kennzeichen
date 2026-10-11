@@ -1,0 +1,24 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <Description>Erkenner-Plugin: YOLOv9-Kennzeichendetektor (open-image-models) + fast-plate-ocr über ONNX Runtime.</Description>
+    <!-- Kopiert alle Abhängigkeiten ins Ausgabeverzeichnis, damit das Plugin eigenständig geladen werden kann. -->
+    <EnableDynamicLoading>true</EnableDynamicLoading>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <!-- Schnittstellen kommen vom Dienst; nicht ins Plugin kopieren, sonst sind die Typen verschieden. -->
+    <ProjectReference Include="..\..\src\Kennzeichen.Abstractions\Kennzeichen.Abstractions.csproj">
+      <Private>false</Private>
+      <ExcludeAssets>runtime</ExcludeAssets>
+    </ProjectReference>
+  </ItemGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Microsoft.ML.OnnxRuntime" Version="1.31.0" />
+    <PackageReference Include="OpenCvSharp4" Version="4.13.0.20260627" />
+    <PackageReference Include="OpenCvSharp4.runtime.win" Version="4.13.0.20260627" />
+    <PackageReference Include="YamlDotNet" Version="18.1.0" />
+  </ItemGroup>
+
+</Project>
