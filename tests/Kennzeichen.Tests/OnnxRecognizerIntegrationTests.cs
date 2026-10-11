@@ -53,7 +53,8 @@ public class OnnxRecognizerIntegrationTests
 
         var reading = Assert.Single(recognizer.Recognize(image, TestContext.Current.CancellationToken));
 
-        Assert.Equal("5AU5341", reading.Text);
+        Assert.Equal("5AU 5341", reading.Text);
+        Assert.Equal("5AU5341", reading.CompactText);
         Assert.Equal(region, reading.Region);
         Assert.InRange(reading.DetectionConfidence, 0.83f, 0.86f);
         Assert.InRange(reading.Box.X, 306, 308);

@@ -11,12 +11,14 @@ public sealed class OnnxPlateRecognizer : IPlateRecognizer
     private readonly YoloV9PlateDetector _detector;
     private readonly PlateOcr _ocr;
     private readonly float _threshold;
+    private readonly OnnxRecognizerOptions _options;
     private readonly ILogger _logger;
 
     public OnnxPlateRecognizer(OnnxRecognizerOptions options, string baseDirectory, ILogger logger)
     {
         _logger = logger;
         _threshold = options.DetectionThreshold;
+        _options = options;
 
         using var sessionOptions = new SessionOptions { IntraOpNumThreads = options.IntraOpNumThreads };
         var detectorPath = Resolve(baseDirectory, options.DetectorModel);
@@ -61,8 +63,9 @@ public sealed class OnnxPlateRecognizer : IPlateRecognizer
                 continue;
             }
 
+            var text = _options.InsertSpaces ? PlateSpacing.Insert(crop, ocr.Text, _options.SpaceGapFactor) : ocr.Text;
             readings.Add(new PlateReading(
-                ocr.Text, ocr.Confidence, detection.Confidence,
+                text, ocr.Confidence, detection.Confidence,
                 new PlateBox(rect.X, rect.Y, rect.Width, rect.Height), ocr.Region));
         }
 
@@ -109,6 +112,16 @@ public sealed class OnnxPlateRecognizerFactory : IPlateRecognizerFactory
         if (settings[nameof(options.DetectionThreshold)] is { } threshold)
         {
             options.DetectionThreshold = float.Parse(threshold, inv);
+        }
+
+        if (settings[nameof(options.InsertSpaces)] is { } insertSpaces)
+        {
+            options.InsertSpaces = bool.Parse(insertSpaces);
+        }
+
+        if (settings[nameof(options.SpaceGapFactor)] is { } gapFactor)
+        {
+            options.SpaceGapFactor = double.Parse(gapFactor, inv);
         }
 
         if (settings[nameof(options.IntraOpNumThreads)] is { } threads)

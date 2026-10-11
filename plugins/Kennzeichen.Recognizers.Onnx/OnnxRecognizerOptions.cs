@@ -12,6 +12,12 @@ public sealed class OnnxRecognizerOptions
     /// <summary>Mindestkonfidenz des Detektors. 0,25 ist der Standardwert von open-image-models für dieses Modell.</summary>
     public float DetectionThreshold { get; set; } = 0.25f;
 
+    /// <summary>Leerzeichen in den Kennzeichentext setzen, z. B. "M AB 1234" statt "MAB1234".</summary>
+    public bool InsertSpaces { get; set; } = true;
+
+    /// <summary>Ein Abstand gilt als Leerzeichen, wenn er so viel größer ist als der mittlere Zeichenabstand.</summary>
+    public double SpaceGapFactor { get; set; } = 2.5;
+
     /// <summary>Anzahl CPU-Threads pro Modell; 0 überlässt die Wahl ONNX Runtime.</summary>
     public int IntraOpNumThreads { get; set; }
 }

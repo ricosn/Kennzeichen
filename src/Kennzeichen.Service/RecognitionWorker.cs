@@ -53,13 +53,13 @@ internal sealed class RecognitionWorker(
 
         foreach (var reading in readings)
         {
-            if (reading.Text.Length < _results.MinTextLength || reading.TextConfidence < _results.MinTextConfidence)
+            if (reading.CompactText.Length < _results.MinTextLength || reading.TextConfidence < _results.MinTextConfidence)
             {
                 logger.LogDebug("Verworfen: {Text} ({Confidence:P0})", reading.Text, reading.TextConfidence);
                 continue;
             }
 
-            if (!_repeats.ShouldReport(frame.SourceId, reading.Text, frame.Timestamp))
+            if (!_repeats.ShouldReport(frame.SourceId, reading.CompactText, frame.Timestamp))
             {
                 continue;
             }

@@ -41,7 +41,7 @@ sc.exe start Kennzeichenerkennung
 Ergebnisse landen in `C:\Kennzeichenerkennung\results\kennzeichen-JJJJ-MM-TT.jsonl`, z. B.:
 
 ```json
-{"sourceId":"einfahrt","timestamp":"2026-10-11T14:03:02.31+00:00","recognizerName":"Onnx","reading":{"text":"5AU5341","textConfidence":0.9998,"detectionConfidence":0.8428,"box":{"x":307,"y":187,"width":80,"height":23},"region":"Czech Republic"}}
+{"sourceId":"einfahrt","timestamp":"2026-10-11T14:03:02.31+00:00","recognizerName":"Onnx","reading":{"text":"5AU 5341","textConfidence":0.9998,"detectionConfidence":0.8428,"box":{"x":307,"y":187,"width":80,"height":23},"region":"Czech Republic","compactText":"5AU5341"}}
 ```
 
 ## Konfiguration (`appsettings.json`)
@@ -83,10 +83,18 @@ Zugangsdaten können statt in der Datei auch als Umgebungsvariablen gesetzt werd
     "OcrModel": "models/cct_xs_v2_global.onnx",
     "OcrConfig": "models/cct_xs_v2_global_plate_config.yaml",
     "DetectionThreshold": 0.25,
+    "InsertSpaces": true,
+    "SpaceGapFactor": 2.5,
     "IntraOpNumThreads": 0
   }
 }
 ```
+
+**Leerzeichen** (`InsertSpaces`, Standard `true`): Der Erkenner sucht die einzelnen Zeichen im Kennzeichenausschnitt und setzt
+ein Leerzeichen, wo der Abstand mehr als `SpaceGapFactor` (Standard 2,5) mal so groß ist wie der mittlere Abstand, z. B.
+`M AB 1234`. Plaketten zwischen Bezirk und Buchstaben werden dabei übergangen, weil sie niedriger sind als die Zeichen.
+Stimmt die Zahl der gefundenen Zeichen nicht mit dem gelesenen Text überein, wird nur zwischen Buchstaben und Ziffern
+getrennt (`MAB 1234`). Für Vergleiche und den Wiederholungsfilter zählt der Text ohne Leerzeichen (`compactText`).
 
 Alternativ das europäische OCR-Modell: `european_mobile_vit_v2_ocr.onnx` mit `european_mobile_vit_v2_ocr_config.yaml`.
 
@@ -124,8 +132,8 @@ Die Modelle werden mit `tools/download-models.ps1` geladen und per SHA-256 gepr�
 | YamlDotNet | [aaubry/YamlDotNet](https://github.com/aaubry/YamlDotNet) | MIT |
 
 Bekannte Grenzen der OCR-Modelle (aus ihren Konfigurationsdateien): Das Alphabet umfasst nur `0-9` und `A-Z`, also keine
-Umlaute; das globale Modell liest bis zu 10, das europäische bis zu 9 Zeichen. Leerzeichen und Bindestriche werden nicht
-ausgegeben. Wie zuverlässig deutsche Kennzeichen unter Ihren Bedingungen erkannt werden, muss mit eigenen Aufnahmen
+Umlaute; das globale Modell liest bis zu 10, das europäische bis zu 9 Zeichen. Leerzeichen kennen die Modelle nicht; der
+Erkenner setzt sie selbst (siehe unten). Wie zuverlässig deutsche Kennzeichen unter Ihren Bedingungen erkannt werden, muss mit eigenen Aufnahmen
 gemessen werden.
 
 ## Entwickeln
