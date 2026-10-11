@@ -7,6 +7,9 @@ public enum CameraSourceType
 
     /// <summary>Einzelbild per HTTP-GET (JPEG), in festem Abstand abgefragt.</summary>
     Snapshot,
+
+    /// <summary>Bilddateien aus einem Ordner (<see cref="CameraOptions.Url"/> ist dann der Ordnerpfad); zum Testen ohne Kamera.</summary>
+    Folder,
 }
 
 /// <summary>Abschnitt <c>Camera</c> der Dienstkonfiguration.</summary>

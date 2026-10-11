@@ -29,6 +29,7 @@ builder.Services.AddSingleton<IFrameSource>(sp =>
     {
         CameraSourceType.Rtsp => ActivatorUtilities.CreateInstance<RtspFrameSource>(sp, camera),
         CameraSourceType.Snapshot => ActivatorUtilities.CreateInstance<HttpSnapshotFrameSource>(sp, camera),
+        CameraSourceType.Folder => ActivatorUtilities.CreateInstance<FolderFrameSource>(sp, camera),
         _ => throw new InvalidOperationException($"Unbekannter Camera:Type '{camera.Type}'."),
     };
 });

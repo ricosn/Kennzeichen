@@ -66,6 +66,9 @@ Ergebnisse landen in `C:\Kennzeichenerkennung\results\kennzeichen-JJJJ-MM-TT.jso
   ausgewertet, höchstens eines pro `IntervalMilliseconds`.
 - `Snapshot`: fragt alle `IntervalMilliseconds` ein JPEG per HTTP ab (Basic- oder Digest-Anmeldung). Die passende
   Einzelbild-URL steht in der Dokumentation des Kameramodells.
+- `Folder`: liest Bilddateien (`.jpg`, `.jpeg`, `.png`, `.bmp`) aus dem Ordner in `Url`, erst alle vorhandenen, dann jede
+  neu hinzugefügte. Zum Testen ohne Kamera; jedes Bild wird einzeln gemeldet. Beispiel ohne Änderung der Datei:
+  `Kennzeichen.Service.exe --Camera:Type=Folder --Camera:Url=testbilder`
 
 Zugangsdaten können statt in der Datei auch als Umgebungsvariablen gesetzt werden: `Camera__Username`, `Camera__Password`.
 
