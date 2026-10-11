@@ -107,8 +107,10 @@ Zugangsdaten können statt in der Datei auch als Umgebungsvariablen gesetzt werd
 **Leerzeichen** (`InsertSpaces`, Standard `true`): Der Erkenner sucht die einzelnen Zeichen im Kennzeichenausschnitt und setzt
 ein Leerzeichen, wo der Abstand mehr als `SpaceGapFactor` (Standard 2,5) mal so groß ist wie der mittlere Abstand, z. B.
 `M AB 1234`. Plaketten zwischen Bezirk und Buchstaben werden dabei übergangen, weil sie niedriger sind als die Zeichen.
-Zwischen Buchstaben und Ziffern steht immer ein Leerzeichen; stimmt die Zahl der gefundenen Zeichen nicht mit dem gelesenen
-Text überein, bleibt es dabei (`MAB 1234`). Für Vergleiche und den Wiederholungsfilter zählt der Text ohne Leerzeichen (`compactText`).
+Zwischen Buchstaben und Ziffern steht immer ein Leerzeichen. Stimmt die Zahl der gefundenen Zeichen nicht mit dem gelesenen
+Text überein (bei kleinen Kennzeichen zerfallen Zeichen oder wachsen zusammen), sucht der Erkenner die Lücken in der Schrift
+(ab 0,35 Zeichenhöhen) und ordnet sie über ihre Lage einer Textstelle zu; ein zusätzliches Leerzeichen setzt er dabei nur
+innerhalb einer Buchstabengruppe, nie zwischen Ziffern. Findet er keine solche Lücke, bleibt es beim Leerzeichen vor den Ziffern (`MAB 1234`). Für Vergleiche und den Wiederholungsfilter zählt der Text ohne Leerzeichen (`compactText`).
 
 Alternativ das europäische OCR-Modell: `european_mobile_vit_v2_ocr.onnx` mit `european_mobile_vit_v2_ocr_config.yaml`.
 

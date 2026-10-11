@@ -45,12 +45,43 @@ public class PlateSpacingTests
     }
 
     [Fact]
-    public void Falls_back_to_letter_digit_split_when_character_count_does_not_match()
+    public void Uses_ink_runs_when_characters_break_apart_on_small_plates()
     {
-        using var plate = DrawPlate();
+        // Wie auf einem kleinen Kamerabild: Das Kennzeichen ist nur 15 Pixel hoch, Zeichen zerfallen oder wachsen zusammen.
+        using var large = DrawPlate();
+        using var plate = new Mat();
+        Cv2.Resize(large, plate, new Size(82, 15), interpolation: InterpolationFlags.Area);
 
-        // Das Modell hat ein Zeichen zu wenig gelesen; die 7 gefundenen Zeichen passen nicht zu 6 Buchstaben/Ziffern.
-        Assert.Equal("MA 1234", PlateSpacing.Insert(plate, "MA1234", 2.5));
+        Assert.NotEqual(7, PlateSpacing.FindCharacterBoxes(plate).Count);
+        Assert.Equal("M AB 1234", PlateSpacing.Insert(plate, "MAB1234", 2.5));
+    }
+
+    [Fact]
+    public void Ink_runs_split_district_code_from_letters()
+    {
+        // Gemessen an einem 15 Pixel hohen Kennzeichen "SN HM 57": N in zwei Teilen, Lücke für die Plaketten nach N.
+        (int, int)[] runs = [(50, 77), (87, 101), (102, 116), (161, 192), (201, 232), (254, 281), (290, 317)];
+
+        Assert.Equal("SN HM 57", PlateSpacing.InsertByInkRuns("SNHM57", runs, 40));
+    }
+
+    [Theory]
+    [InlineData("SNHM57", "SNHM 57")]
+    [InlineData("1234AB", "1234AB")]
+    public void Ink_runs_without_large_gaps_split_only_letters_from_digits(string text, string expected)
+    {
+        (int, int)[] runs = [(0, 20), (24, 44), (48, 68), (72, 92), (96, 116), (120, 140)];
+
+        Assert.Equal(expected, PlateSpacing.InsertByInkRuns(text, runs, 40));
+    }
+
+    [Fact]
+    public void Ink_runs_never_split_digits()
+    {
+        (int, int)[] runs = [(0, 20), (24, 44), (90, 110), (114, 134)];
+
+        Assert.Equal("AB 12", PlateSpacing.InsertByInkRuns("AB12", runs, 40));
+        Assert.Equal("1234", PlateSpacing.InsertByInkRuns("1234", runs, 40));
     }
 
     /// <summary>Schwarze Schrift auf Weiß, links ein blaues Feld, zwischen Bezirk und Buchstaben zwei runde Plaketten.</summary>
