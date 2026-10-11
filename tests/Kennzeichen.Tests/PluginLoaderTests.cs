@@ -36,7 +36,14 @@ public class PluginLoaderTests
         }
         finally
         {
-            root.Delete(recursive: true);
+            // Unter Windows bleibt die geladene Plugin-DLL bis Prozessende gesperrt; Aufräumen ist daher nur ein Versuch.
+            try
+            {
+                root.Delete(recursive: true);
+            }
+            catch (Exception ex) when (ex is IOException or UnauthorizedAccessException)
+            {
+            }
         }
     }
 
