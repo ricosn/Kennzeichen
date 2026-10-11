@@ -50,10 +50,11 @@ builder.Services.AddSingleton<IPlateRecognizer>(sp =>
 });
 
 builder.Services.AddSingleton<IResultSink, LogResultSink>();
-var jsonDirectory = builder.Configuration["Results:JsonLinesDirectory"] ?? new ResultOptions().JsonLinesDirectory;
+var jsonDirectory = builder.Configuration["Results:JsonDirectory"] ?? new ResultOptions().JsonDirectory;
 if (!string.IsNullOrWhiteSpace(jsonDirectory))
 {
-    builder.Services.AddSingleton<IResultSink>(new JsonLinesResultSink(Path.GetFullPath(jsonDirectory, AppContext.BaseDirectory)));
+    var fullJsonDirectory = Path.GetFullPath(jsonDirectory, AppContext.BaseDirectory);
+    builder.Services.AddSingleton<IResultSink>(sp => ActivatorUtilities.CreateInstance<JsonFileResultSink>(sp, fullJsonDirectory));
 }
 
 builder.Services.AddHostedService<RecognitionWorker>();

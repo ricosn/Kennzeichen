@@ -22,6 +22,6 @@ public sealed class ResultOptions
     /// <summary>Dasselbe Kennzeichen derselben Kamera wird innerhalb dieser Zeit nur einmal gemeldet.</summary>
     public int SuppressRepeatSeconds { get; set; } = 30;
 
-    /// <summary>Ordner für JSON-Lines-Dateien (eine Datei pro Tag); leer schaltet die Dateiausgabe ab.</summary>
-    public string? JsonLinesDirectory { get; set; } = "results";
+    /// <summary>Ordner für die JSON-Dateien (eine Datei pro Tag); leer schaltet die Dateiausgabe ab.</summary>
+    public string? JsonDirectory { get; set; } = "results";
 }

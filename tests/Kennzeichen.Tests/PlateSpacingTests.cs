@@ -16,6 +16,14 @@ public class PlateSpacingTests
         Assert.Equal("5AU 5341", PlateSpacing.InsertByGaps("5AU5341", boxes, 2.5));
     }
 
+    [Fact]
+    public void Always_splits_letters_from_digits_even_when_gaps_are_even()
+    {
+        var boxes = Enumerable.Range(0, 7).Select(i => new Rect(i * 30, 0, 20, 40)).ToList();
+
+        Assert.Equal("MAB 1234", PlateSpacing.InsertByGaps("MAB1234", boxes, 2.5));
+    }
+
     [Theory]
     [InlineData("MAB1234", "MAB 1234")]
     [InlineData("B1234", "B 1234")]

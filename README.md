@@ -2,11 +2,11 @@
 
 Kfz-Kennzeichenerkennung als Windows-Dienst. Der Dienst holt Bilder von einer Netzwerkkamera (RTSP oder
 HTTP-Einzelbild), lässt sie von einem austauschbaren Erkenner-Plugin auswerten und schreibt die Ergebnisse ins
-Log (Ereignisanzeige) und als JSON-Zeilen in eine Datei pro Tag.
+Log (Ereignisanzeige) und in eine JSON-Datei pro Tag.
 
 ```
 Kamera ──► IFrameSource ──► RecognitionWorker ──► IPlateRecognizer (Plugin) ──► IResultSink
-           RTSP / Snapshot   Filter, Wiederholungen       z. B. "Onnx"              Log, JSON-Lines
+           RTSP / Snapshot   Filter, Wiederholungen       z. B. "Onnx"              Log, JSON-Datei
 ```
 
 ## Aufbau
@@ -38,10 +38,24 @@ C:\Kennzeichenerkennung\Kennzeichen.Service.exe
 sc.exe start Kennzeichenerkennung
 ```
 
-Ergebnisse landen in `C:\Kennzeichenerkennung\results\kennzeichen-JJJJ-MM-TT.jsonl`, z. B.:
+Ergebnisse landen in `C:\Kennzeichenerkennung\results\kennzeichen-JJJJ-MM-TT.json`, ein JSON-Array pro Tag, z. B.:
 
 ```json
-{"sourceId":"einfahrt","timestamp":"2026-10-11T14:03:02.31+00:00","recognizerName":"Onnx","reading":{"text":"5AU 5341","textConfidence":0.9998,"detectionConfidence":0.8428,"box":{"x":307,"y":187,"width":80,"height":23},"region":"Czech Republic","compactText":"5AU5341"}}
+[
+  {
+    "sourceId": "einfahrt",
+    "timestamp": "2026-10-11T14:03:02.31+00:00",
+    "recognizerName": "Onnx",
+    "reading": {
+      "text": "5AU 5341",
+      "textConfidence": 0.9998,
+      "detectionConfidence": 0.8428,
+      "box": { "x": 307, "y": 187, "width": 80, "height": 23 },
+      "region": "Czech Republic",
+      "compactText": "5AU5341"
+    }
+  }
+]
 ```
 
 ## Konfiguration (`appsettings.json`)
@@ -93,8 +107,8 @@ Zugangsdaten können statt in der Datei auch als Umgebungsvariablen gesetzt werd
 **Leerzeichen** (`InsertSpaces`, Standard `true`): Der Erkenner sucht die einzelnen Zeichen im Kennzeichenausschnitt und setzt
 ein Leerzeichen, wo der Abstand mehr als `SpaceGapFactor` (Standard 2,5) mal so groß ist wie der mittlere Abstand, z. B.
 `M AB 1234`. Plaketten zwischen Bezirk und Buchstaben werden dabei übergangen, weil sie niedriger sind als die Zeichen.
-Stimmt die Zahl der gefundenen Zeichen nicht mit dem gelesenen Text überein, wird nur zwischen Buchstaben und Ziffern
-getrennt (`MAB 1234`). Für Vergleiche und den Wiederholungsfilter zählt der Text ohne Leerzeichen (`compactText`).
+Zwischen Buchstaben und Ziffern steht immer ein Leerzeichen; stimmt die Zahl der gefundenen Zeichen nicht mit dem gelesenen
+Text überein, bleibt es dabei (`MAB 1234`). Für Vergleiche und den Wiederholungsfilter zählt der Text ohne Leerzeichen (`compactText`).
 
 Alternativ das europäische OCR-Modell: `european_mobile_vit_v2_ocr.onnx` mit `european_mobile_vit_v2_ocr_config.yaml`.
 
@@ -105,7 +119,7 @@ Alternativ das europäische OCR-Modell: `european_mobile_vit_v2_ocr.onnx` mit `e
 | `MinTextConfidence` | Mittlere Zeichen-Konfidenz, ab der gemeldet wird (Standard 0,5) |
 | `MinTextLength` | Mindestlänge des Textes (Standard 3) |
 | `SuppressRepeatSeconds` | Dasselbe Kennzeichen derselben Kamera wird erst wieder gemeldet, wenn es so lange nicht gesehen wurde |
-| `JsonLinesDirectory` | Ordner für die JSON-Dateien; leer schaltet die Dateiausgabe ab |
+| `JsonDirectory` | Ordner für die JSON-Dateien (eine pro Tag); leer schaltet die Dateiausgabe ab |
 
 ## Eigenen Erkenner einbauen
 

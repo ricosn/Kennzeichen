@@ -6,7 +6,7 @@ namespace Kennzeichen.Recognizers.Onnx;
 /// Setzt Leerzeichen in den gelesenen Text, denn die OCR-Modelle kennen kein Leerzeichen (Alphabet 0-9, A-Z).
 /// Vorgehen: Zeichen im Ausschnitt als zusammenhängende Flächen finden; passt ihre Anzahl zur Textlänge,
 /// kommt ein Leerzeichen dorthin, wo der Abstand zwischen zwei Zeichen deutlich größer ist als üblich.
-/// Sonst wird nur beim Wechsel von Buchstabe zu Ziffer getrennt.
+/// Beim Wechsel von Buchstabe zu Ziffer wird immer getrennt, auch wenn die Abstände nicht auswertbar sind.
 /// </summary>
 public static class PlateSpacing
 {
@@ -24,7 +24,7 @@ public static class PlateSpacing
     }
 
     /// <summary>Leerzeichen dort, wo der Abstand größer ist als <paramref name="gapFactor"/> mal der mittlere Abstand
-    /// und größer als ein Drittel der mittleren Zeichenbreite.</summary>
+    /// und größer als ein Drittel der mittleren Zeichenbreite, sowie zwischen Buchstabe und Ziffer.</summary>
     public static string InsertByGaps(string text, IReadOnlyList<Rect> boxes, double gapFactor)
     {
         var gaps = new int[boxes.Count - 1];
@@ -37,7 +37,7 @@ public static class PlateSpacing
         var result = new System.Text.StringBuilder(text.Length + 3);
         for (var i = 0; i < text.Length; i++)
         {
-            if (i > 0 && gaps[i - 1] > threshold)
+            if (i > 0 && (gaps[i - 1] > threshold || IsLetterToDigit(text, i)))
             {
                 result.Append(' ');
             }
@@ -53,7 +53,7 @@ public static class PlateSpacing
         var result = new System.Text.StringBuilder(text.Length + 2);
         for (var i = 0; i < text.Length; i++)
         {
-            if (i > 0 && char.IsLetter(text[i - 1]) && char.IsDigit(text[i]))
+            if (i > 0 && IsLetterToDigit(text, i))
             {
                 result.Append(' ');
             }
@@ -63,6 +63,8 @@ public static class PlateSpacing
 
         return result.ToString();
     }
+
+    private static bool IsLetterToDigit(string text, int i) => char.IsLetter(text[i - 1]) && char.IsDigit(text[i]);
 
     /// <summary>
     /// Dunkle Zeichen auf hellem Grund, von links nach rechts. Aussortiert werden Flächen, die zu klein oder zu breit sind,
