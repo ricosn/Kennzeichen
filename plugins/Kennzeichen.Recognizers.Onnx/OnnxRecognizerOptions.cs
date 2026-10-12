@@ -20,4 +20,10 @@ public sealed class OnnxRecognizerOptions
 
     /// <summary>Anzahl CPU-Threads pro Modell; 0 überlässt die Wahl ONNX Runtime.</summary>
     public int IntraOpNumThreads { get; set; }
+
+    /// <summary>
+    /// Ob wartende ONNX-Runtime-Threads aktiv auf Arbeit warten ("spinning"). Laut ONNX-Runtime-Doku ist das
+    /// schneller, "consumes more CPU cycles"; Standard dort ist an. Hier aus, weil höchstens ein paar Bilder pro Sekunde kommen.
+    /// </summary>
+    public bool AllowSpinning { get; set; }
 }

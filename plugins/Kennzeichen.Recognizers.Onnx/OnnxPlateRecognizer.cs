@@ -21,6 +21,11 @@ public sealed class OnnxPlateRecognizer : IPlateRecognizer
         _options = options;
 
         using var sessionOptions = new SessionOptions { IntraOpNumThreads = options.IntraOpNumThreads };
+
+        // https://onnxruntime.ai/docs/performance/tune-performance/threading.html
+        var spinning = options.AllowSpinning ? "1" : "0";
+        sessionOptions.AddSessionConfigEntry("session.intra_op.allow_spinning", spinning);
+        sessionOptions.AddSessionConfigEntry("session.inter_op.allow_spinning", spinning);
         var detectorPath = Resolve(baseDirectory, options.DetectorModel);
         var ocrPath = Resolve(baseDirectory, options.OcrModel);
         var configPath = Resolve(baseDirectory, options.OcrConfig);
@@ -127,6 +132,11 @@ public sealed class OnnxPlateRecognizerFactory : IPlateRecognizerFactory
         if (settings[nameof(options.IntraOpNumThreads)] is { } threads)
         {
             options.IntraOpNumThreads = int.Parse(threads, inv);
+        }
+
+        if (settings[nameof(options.AllowSpinning)] is { } spinning)
+        {
+            options.AllowSpinning = bool.Parse(spinning);
         }
     }
 }

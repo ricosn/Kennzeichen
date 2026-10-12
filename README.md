@@ -70,7 +70,8 @@ Ergebnisse landen in `C:\Kennzeichenerkennung\results\kennzeichen-JJJJ-MM-TT.jso
   "Username": "benutzer",
   "Password": "passwort",
   "IntervalMilliseconds": 250,
-  "ReconnectDelaySeconds": 5
+  "ReconnectDelaySeconds": 5,
+  "HardwareDecoding": true
 }
 ```
 
@@ -86,6 +87,23 @@ Ergebnisse landen in `C:\Kennzeichenerkennung\results\kennzeichen-JJJJ-MM-TT.jso
 
 Zugangsdaten können statt in der Datei auch als Umgebungsvariablen gesetzt werden: `Camera__Username`, `Camera__Password`.
 
+#### CPU-Last beim RTSP-Stream
+
+Jedes Bild des Streams muss dekodiert werden, auch wenn nur alle `IntervalMilliseconds` eines ausgewertet wird. Der Aufwand
+wächst mit Auflösung und Bildrate. Was hilft:
+
+1. **Weniger Bilder und Pixel von der Kamera anfordern.** Axis-Kameras nehmen das in der URL an, z. B.
+   `rtsp://192.168.0.90/axis-media/media.amp?resolution=1280x720&fps=10`. `fps` ist die Bildrate (0 = unbegrenzt),
+   `resolution` ist modellabhängig ([VAPIX Video Streaming API, Abschnitt 3.4](https://wiki.2n.com/hip/inte/files/latest/en/25340932/25340931/1/1519853908027/vapix_video_streaming_52937_en_1307.pdf),
+   Axis-Dokument von 2013, auf aktuellem Modell prüfen). Das Kennzeichen sollte im Bild weiterhin gut lesbar sein.
+2. `HardwareDecoding` (Standard `true`): dekodiert über die Grafikeinheit (unter Windows D3D11), falls OpenCV eine findet;
+   sonst in Software. Welche Art aktiv ist, steht beim Verbinden im Log („Hardware-Dekodierung: D3D11“ oder „None“).
+3. `IntervalMilliseconds` erhöhen: Jede Erkennung kostet Rechenzeit; 500 statt 250 halbiert die Zahl der Erkennungen.
+
+Der Dienst rechnet nur die Bilder in BGR um, die er auch auswertet, und ONNX Runtime wartet nicht mehr aktiv auf Arbeit
+(`AllowSpinning`, Standard `false`; laut [ONNX-Runtime-Doku](https://onnxruntime.ai/docs/performance/tune-performance/threading.html)
+kostet Spinning „more CPU cycles“).
+
 ### Erkenner
 
 ```json
@@ -99,7 +117,8 @@ Zugangsdaten können statt in der Datei auch als Umgebungsvariablen gesetzt werd
     "DetectionThreshold": 0.25,
     "InsertSpaces": true,
     "SpaceGapFactor": 2.5,
-    "IntraOpNumThreads": 0
+    "IntraOpNumThreads": 0,
+    "AllowSpinning": false
   }
 }
 ```

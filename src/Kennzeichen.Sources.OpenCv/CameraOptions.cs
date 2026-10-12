@@ -34,4 +34,10 @@ public sealed class CameraOptions
     public int IntervalMilliseconds { get; set; } = 250;
 
     public int ReconnectDelaySeconds { get; set; } = 5;
+
+    /// <summary>
+    /// Nur RTSP: Video über die Grafikeinheit dekodieren lassen (unter Windows D3D11), falls vorhanden.
+    /// Ist keine nutzbar, dekodiert OpenCV laut Dokumentation in Software weiter. Welche Art aktiv ist, steht beim Verbinden im Log.
+    /// </summary>
+    public bool HardwareDecoding { get; set; } = true;
 }
