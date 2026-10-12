@@ -1,0 +1,33 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <OutputType>Exe</OutputType>
+    <IsPackable>false</IsPackable>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Microsoft.NET.Test.Sdk" Version="18.10.1" />
+    <PackageReference Include="xunit.v3" Version="4.0.2" />
+    <PackageReference Include="xunit.runner.visualstudio" Version="4.0.1" />
+  </ItemGroup>
+
+  <!-- Native OpenCV-Bibliothek für Testläufe unter Linux; unter Windows kommt sie aus OpenCvSharp4.runtime.win. -->
+  <ItemGroup Condition="'$(OS)' != 'Windows_NT'">
+    <PackageReference Include="OpenCvSharp4.official.runtime.linux-x64" Version="4.13.0.20260627" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\..\src\Kennzeichen.Service\Kennzeichen.Service.csproj" />
+    <ProjectReference Include="..\..\src\Kennzeichen.Sources.OpenCv\Kennzeichen.Sources.OpenCv.csproj" />
+    <ProjectReference Include="..\..\plugins\Kennzeichen.Recognizers.Onnx\Kennzeichen.Recognizers.Onnx.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <None Include="TestData\**" CopyToOutputDirectory="PreserveNewest" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Using Include="Xunit" />
+  </ItemGroup>
+
+</Project>

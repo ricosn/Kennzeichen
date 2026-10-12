@@ -1,0 +1,13 @@
+<Solution>
+  <Folder Name="/plugins/">
+    <Project Path="plugins/Kennzeichen.Recognizers.Onnx/Kennzeichen.Recognizers.Onnx.csproj" />
+  </Folder>
+  <Folder Name="/src/">
+    <Project Path="src/Kennzeichen.Abstractions/Kennzeichen.Abstractions.csproj" />
+    <Project Path="src/Kennzeichen.Service/Kennzeichen.Service.csproj" />
+    <Project Path="src/Kennzeichen.Sources.OpenCv/Kennzeichen.Sources.OpenCv.csproj" />
+  </Folder>
+  <Folder Name="/tests/">
+    <Project Path="tests/Kennzeichen.Tests/Kennzeichen.Tests.csproj" />
+  </Folder>
+</Solution>
